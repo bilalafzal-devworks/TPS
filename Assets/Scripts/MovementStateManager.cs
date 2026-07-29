@@ -20,6 +20,7 @@ public class MovementStateManager : MonoBehaviour
 
     [Header("GravitationalForce")]
     [SerializeField] float gravity = -9.81f;
+
     [Header("GroundMask")]
     [SerializeField] LayerMask groundMask;
     [SerializeField] float groundYOffset = 1f;
@@ -27,6 +28,7 @@ public class MovementStateManager : MonoBehaviour
 
     Vector3 velocity = Vector3.zero;
     [HideInInspector] public Animator anim;
+
     #region MovementStates
     MovementBaseState currentState;
     [HideInInspector] public IdleState idleState = new IdleState();
@@ -37,8 +39,7 @@ public class MovementStateManager : MonoBehaviour
 
     void Awake()
     {
-
-        anim = GetComponentInChildren<Animator>();
+        anim = GetComponent<Animator>();
     }
     void Start()
     {
@@ -88,8 +89,7 @@ public class MovementStateManager : MonoBehaviour
     {
         //characterController = GetComponent<CharacterController>();
         //if (!characterController) return;
-
-        Gizmos.color = Color.red;
+        Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(spherePos, characterController.radius - 0.05f);
     }
 

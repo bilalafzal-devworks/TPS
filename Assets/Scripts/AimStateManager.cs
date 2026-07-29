@@ -14,19 +14,23 @@ public class AimStateManager : MonoBehaviour
     AimBaseState currentState;
     [HideInInspector] public Hip hipFireState = new Hip();
     [HideInInspector] public ADS adsState = new ADS();
+
     #endregion
-
     [HideInInspector] public Animator anim;
-
     [Header("CineMachine")]
-
     #region Cinemachine
+
     [HideInInspector] CinemachineVirtualCamera vCam;
     public float adsFov = 50f;
     public float hipFov;
     public float currentFov;
     public float fovSmoothSpeed = 10f;
+    #endregion
 
+    #region WeaponAiming
+    [SerializeField] float aimSmoothPos = 5f;
+    [SerializeField] Transform aimPos;
+    [SerializeField] LayerMask aimMask;
 
     #endregion
     void Start()
@@ -35,7 +39,7 @@ public class AimStateManager : MonoBehaviour
 
         vCam = FindAnyObjectByType<Cinemachine.CinemachineVirtualCamera>();
         hipFov = vCam.m_Lens.FieldOfView;
-        anim = GetComponentInChildren<Animator>();
+        anim = GetComponent<Animator>();
 
         if (!anim)
             Debug.Log("Animator not assigned");
@@ -57,6 +61,16 @@ public class AimStateManager : MonoBehaviour
         yAxis -= Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
         yAxis = Mathf.Clamp(yAxis, -80, 80);
         currentState.UpdateState(this);
+
+        //Screen centre Calculating
+        Vector2 screenCentre = new Vector2(Screen.width / 2, Screen.height / 2);
+        Ray ray = Camera.main.ScreenPointToRay(screenCentre);
+        //raycast
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, aimMask))
+        {
+            aimPos.position = Vector3.Lerp(aimPos.position, hit.point, aimSmoothPos * Time.deltaTime);
+        }
+
         vCam.m_Lens.FieldOfView = Mathf.Lerp(vCam.m_Lens.FieldOfView, currentFov, fovSmoothSpeed * Time.deltaTime);
     }
 
