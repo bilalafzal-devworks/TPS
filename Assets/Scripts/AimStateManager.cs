@@ -29,13 +29,13 @@ public class AimStateManager : MonoBehaviour
 
     #region WeaponAiming
     [SerializeField] float aimSmoothPos = 5f;
-    [SerializeField] Transform aimPos;
+    public Transform aimPos;
     [SerializeField] LayerMask aimMask;
 
     #endregion
     void Start()
     {
-        Debug.Log("adsFov = " + adsFov);
+        //Debug.Log("adsFov = " + adsFov);
 
         vCam = FindAnyObjectByType<Cinemachine.CinemachineVirtualCamera>();
         hipFov = vCam.m_Lens.FieldOfView;

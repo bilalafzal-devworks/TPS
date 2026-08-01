@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class MovementStateManager : MonoBehaviour
 {
+    [Header("Grounded-Msg")]
+    [SerializeField] bool groundMsg;
     [Header("Input")]
     public float hzInput, vInput;
     #region Speed
@@ -79,7 +81,10 @@ public class MovementStateManager : MonoBehaviour
         spherePos = new Vector3(transform.position.x, transform.position.y - groundYOffset, transform.position.z);
         if (Physics.CheckSphere(spherePos, characterController.radius - 0.05f, groundMask))
         {
-            Debug.Log("Player is grounded :)");
+            if (groundMsg)
+            {
+                Debug.Log("Player is grounded :)");
+            }
             return true;
         }
         else
