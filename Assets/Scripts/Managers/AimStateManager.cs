@@ -32,6 +32,8 @@ public class AimStateManager : MonoBehaviour
     public Transform aimPos;
     [SerializeField] LayerMask aimMask;
 
+    [SerializeField] Transform muzzlepos;
+
     #endregion
     void Start()
     {
@@ -86,5 +88,15 @@ public class AimStateManager : MonoBehaviour
     {
         currentState = state;
         currentState.EnterState(this);
+    }
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        //Physics.Raycast(muzzlepos.position,muzzlepos.forward,out RaycastHit hit,Mathf.Infinity);
+        if (Physics.Raycast(muzzlepos.position, muzzlepos.forward, out RaycastHit hit, Mathf.Infinity))
+        {
+            Gizmos.DrawLine(muzzlepos.position, hit.point);
+            //Gizmos.DrawWireSphere(hit.point, 0.1f);
+        }
     }
 }
