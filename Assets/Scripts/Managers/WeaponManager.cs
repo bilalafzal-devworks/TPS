@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -23,31 +24,55 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] AudioClip gunShoot;
     [SerializeField] AudioClip emptyAmmo;
 
-     public AudioClip magIn;
-     public AudioClip magOut;
-     public AudioClip releaseSlide;
-     public AudioClip gunMode;
+    public AudioClip magIn;
+    public AudioClip magOut;
+    public AudioClip releaseSlide;
+    public AudioClip gunMode;
     AudioSource audioSource;
     AmmoManager ammo;
+
+    WeaponRecoil recoil;
+    public bool Msg;
+
+    [Header("Muzzle Flash ")]
+    ParticleSystem muzzleFlashParticle;
+    Light muzzleFlashLight;
+    [SerializeField] float lightIntensity = 2f;
+    float lightReturnSpeed = 20f;
 
 
     void Start()
     {
+        recoil = GetComponent<WeaponRecoil>();
         ammo = GetComponent<AmmoManager>();
         audioSource = GetComponent<AudioSource>();
+        muzzleFlashParticle = GetComponentInChildren<ParticleSystem>();
+        muzzleFlashLight = GetComponentInChildren<Light>();
         aim = GetComponentInParent<AimStateManager>();
         fireRateTimer = fireRate; //cause first bullet to be shooted without any delay
+
+        if (!muzzleFlashLight)
+        {
+          Debug.Log("Light Missing");
+          return;  
+        } 
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (isAutomatic && Msg)
+            Debug.Log("FireMode : Auto");
+        if (!isAutomatic && Msg)
+            Debug.Log("FireMode : Single");
+
         if (Input.GetKeyDown(KeyCode.B))
         {
-          isAutomatic = !isAutomatic;  
-          audioSource.PlayOneShot(gunMode);
-        } 
+            isAutomatic = !isAutomatic;
+            audioSource.PlayOneShot(gunMode);
+        }
         if (ShouldFire()) Fire();
+        muzzleFlashLight.intensity = Mathf.Lerp(muzzleFlashLight.intensity, 0, lightReturnSpeed * Time.deltaTime);
     }
     // bool ShouldFire()
     // {
@@ -85,11 +110,20 @@ public class WeaponManager : MonoBehaviour
         ammo.currentAmmo -= bullerPerShot; ;
         //play gunshot sound
         audioSource.PlayOneShot(gunShoot);
+        recoil.TriggerRecoil();
+        TriggerMuzzleFlash();
         for (int i = 0; i < bullerPerShot; i++)
         {
             GameObject currentBullet = Instantiate(bulletPrefab, barrelPos.position, barrelPos.rotation);
             Rigidbody rb = currentBullet.GetComponent<Rigidbody>();
             rb.AddForce(barrelPos.forward * bulletVeclocity, ForceMode.Impulse);
         }
+    }
+
+    void TriggerMuzzleFlash()
+    {
+        muzzleFlashParticle.Play();
+        muzzleFlashLight.intensity = lightIntensity;
+
     }
 }
