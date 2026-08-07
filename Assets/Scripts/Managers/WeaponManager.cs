@@ -40,6 +40,7 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] float lightIntensity = 2f;
     float lightReturnSpeed = 20f;
 
+    WeaponBloom bloom;
 
     void Start()
     {
@@ -48,14 +49,15 @@ public class WeaponManager : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         muzzleFlashParticle = GetComponentInChildren<ParticleSystem>();
         muzzleFlashLight = GetComponentInChildren<Light>();
+        bloom = GetComponent<WeaponBloom>();
         aim = GetComponentInParent<AimStateManager>();
         fireRateTimer = fireRate; //cause first bullet to be shooted without any delay
 
         if (!muzzleFlashLight)
         {
-          Debug.Log("Light Missing");
-          return;  
-        } 
+            Debug.Log("Light Missing");
+            return;
+        }
     }
 
     // Update is called once per frame
@@ -106,6 +108,8 @@ public class WeaponManager : MonoBehaviour
     {
         fireRateTimer = 0f;
         barrelPos.LookAt(aim.aimPos);//focus on aim position 
+        //adding ammo spread
+        barrelPos.localEulerAngles = bloom.BloomAngles(barrelPos);
         // Debug.Log("Fire");
         ammo.currentAmmo -= bullerPerShot; ;
         //play gunshot sound
@@ -124,6 +128,5 @@ public class WeaponManager : MonoBehaviour
     {
         muzzleFlashParticle.Play();
         muzzleFlashLight.intensity = lightIntensity;
-
     }
 }

@@ -32,7 +32,7 @@ public class MovementStateManager : MonoBehaviour
     [HideInInspector] public Animator anim;
 
     #region MovementStates
-    MovementBaseState currentState;
+    [HideInInspector] public MovementBaseState currentState;
     [HideInInspector] public IdleState idleState = new IdleState();
     [HideInInspector] public WalkingState walkingState = new WalkingState();
     [HideInInspector] public RunningState runningState = new RunningState();

@@ -11,7 +11,7 @@ public class AimStateManager : MonoBehaviour
     [SerializeField] float mouseSensitivity = 1f;
 
     #region AimStates
-    AimBaseState currentState;
+    [HideInInspector] public AimBaseState currentState;
     [HideInInspector] public Hip hipFireState = new Hip();
     [HideInInspector] public ADS adsState = new ADS();
 
