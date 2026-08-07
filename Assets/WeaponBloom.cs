@@ -16,11 +16,16 @@ public class WeaponBloom : MonoBehaviour
     [SerializeField] float currentBloomAngle;
     MovementStateManager movement;
     AimStateManager aim;
+
+// #region Original-Muzzle Rotation
+//     float x
     void Start()
     {
         movement = GetComponentInParent<MovementStateManager>();
         aim = GetComponentInParent<AimStateManager>();
+
     }
+
 
     public Vector3 BloomAngles(Transform barrelPos)
     {
@@ -45,4 +50,9 @@ public class WeaponBloom : MonoBehaviour
         Vector3 randomRotation = new Vector3(randX, randy, randZ);
         return barrelPos.localEulerAngles + randomRotation;
     }
+    // public void ResetBloom(Transform barrelPos)
+    // {
+        
+
+    // }
 }

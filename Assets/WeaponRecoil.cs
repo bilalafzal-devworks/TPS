@@ -12,14 +12,17 @@ public class WeaponRecoil : MonoBehaviour
 
     float currentRecoilPos, finalRecoilPos;
 
+    Transform backupTransform;
+
 
 
     void Update()
-    {
+    {   //backupTransform = recoilFollowPos;
         currentRecoilPos = Mathf.Lerp(currentRecoilPos, 0, returnAmount * Time.deltaTime);
         finalRecoilPos = Mathf.Lerp(finalRecoilPos, currentRecoilPos, kickBackSpeed * Time.deltaTime);
         recoilFollowPos.localPosition = new Vector3(recoilFollowPos.localPosition.x, recoilFollowPos.localPosition.y, finalRecoilPos);
     }
     public void TriggerRecoil() => currentRecoilPos += kickBackAmount;
+    //public void ResetRecoilPos() => currentRecoilPos += backupTransform;
 
 }

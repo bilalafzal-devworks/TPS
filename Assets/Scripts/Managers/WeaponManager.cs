@@ -63,16 +63,19 @@ public class WeaponManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isAutomatic && Msg)
-            Debug.Log("FireMode : Auto");
-        if (!isAutomatic && Msg)
-            Debug.Log("FireMode : Single");
+
 
         if (Input.GetKeyDown(KeyCode.B))
         {
             isAutomatic = !isAutomatic;
             audioSource.PlayOneShot(gunMode);
         }
+        
+        if (isAutomatic && Msg)
+            Debug.Log("FireMode : Auto");
+        if (!isAutomatic && Msg)
+            Debug.Log("FireMode : Single");
+
         if (ShouldFire()) Fire();
         muzzleFlashLight.intensity = Mathf.Lerp(muzzleFlashLight.intensity, 0, lightReturnSpeed * Time.deltaTime);
     }
@@ -93,7 +96,13 @@ public class WeaponManager : MonoBehaviour
 
         bool wantsToFire = (!isAutomatic && Input.GetKeyDown(KeyCode.Mouse0)) || (isAutomatic && Input.GetKey(KeyCode.Mouse0));
 
-        if (!wantsToFire) return false;
+        if (!wantsToFire)
+        {
+            //if I stop shooting it will reset the bloom
+            //here reset logic of bloom should be implemented
+            barrelPos.localRotation = Quaternion.identity;
+            return false;
+        }
 
         if (ammo.currentAmmo == 0)
         {

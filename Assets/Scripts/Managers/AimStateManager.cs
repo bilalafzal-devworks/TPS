@@ -4,6 +4,7 @@ using UnityEngine;
 using Cinemachine;
 using UnityEngine.SocialPlatforms;
 using TreeEditor;
+using UnityEngine.UIElements;
 public class AimStateManager : MonoBehaviour
 {
     [SerializeField] Transform camFollowPos;
@@ -35,9 +36,23 @@ public class AimStateManager : MonoBehaviour
     [SerializeField] Transform muzzlepos;
 
     #endregion
+
+
+    #region ShoulderSwap
+    [Header("Shoulder Swap")]
+    float xCamPos, yCamPos, ogYCamPos;
+    [SerializeField] float yCamHeight = 0f;
+    float returnCamSpeed = 10f;
+    MovementStateManager movement;
+    #endregion
+
     void Start()
     {
         //Debug.Log("adsFov = " + adsFov);
+        movement = GetComponent<MovementStateManager>();
+        xCamPos = camFollowPos.localPosition.x;
+        ogYCamPos = camFollowPos.localPosition.y; //taking backup of current yPos
+        yCamPos = ogYCamPos;
 
         vCam = FindAnyObjectByType<Cinemachine.CinemachineVirtualCamera>();
         hipFov = vCam.m_Lens.FieldOfView;
@@ -62,18 +77,18 @@ public class AimStateManager : MonoBehaviour
         xAxis += Input.GetAxisRaw("Mouse X") * mouseSensitivity;
         yAxis -= Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
         yAxis = Mathf.Clamp(yAxis, -80, 80);
-        currentState.UpdateState(this);
+
 
         //Screen centre Calculating
         Vector2 screenCentre = new Vector2(Screen.width / 2, Screen.height / 2);
         Ray ray = Camera.main.ScreenPointToRay(screenCentre);
         //raycast
         if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, aimMask))
-        {
             aimPos.position = Vector3.Lerp(aimPos.position, hit.point, aimSmoothPos * Time.deltaTime);
-        }
 
         vCam.m_Lens.FieldOfView = Mathf.Lerp(vCam.m_Lens.FieldOfView, currentFov, fovSmoothSpeed * Time.deltaTime);
+        ShoulderSwap();
+        currentState.UpdateState(this);
     }
 
     void LateUpdate()
@@ -98,5 +113,18 @@ public class AimStateManager : MonoBehaviour
             Gizmos.DrawLine(muzzlepos.position, hit.point);
             //Gizmos.DrawWireSphere(hit.point, 0.1f);
         }
+    }
+    void ShoulderSwap()
+    {
+        if (Input.GetKeyDown(KeyCode.X))
+            xCamPos = -xCamPos;
+        if (movement.currentState == movement.crouchState)
+            yCamPos = yCamHeight;//will change the height of camera if we are currently in crouch state
+        else
+            yCamPos = ogYCamPos; //return to original camera yFollow
+
+        Vector3 newCamPos = new Vector3(xCamPos, yCamPos, camFollowPos.localPosition.z);
+
+        camFollowPos.localPosition = Vector3.Lerp(camFollowPos.localPosition, newCamPos, returnCamSpeed * Time.deltaTime);
     }
 }
