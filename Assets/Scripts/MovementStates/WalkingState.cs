@@ -25,8 +25,16 @@ public class WalkingState : MovementBaseState
             movement.currentSpeed = movement.walkSpeed;
         else
             movement.currentSpeed = movement.walkBackSpeed;
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            movement.previousState = this;
+            // movement.SwitchState(movement.jumpState);
+            ExitState(movement, movement.jumpState);
+
+        }
     }
-    
+
     void ExitState(MovementStateManager movement, MovementBaseState state)
     {
         movement.anim.SetBool("Walking", false);

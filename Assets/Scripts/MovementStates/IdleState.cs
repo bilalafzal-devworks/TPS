@@ -24,5 +24,12 @@ public class IdleState : MovementBaseState
         //means Crouch state mei change krna hai
         if (Input.GetKeyDown(KeyCode.C))
             movement.SwitchState(movement.crouchState);
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            movement.previousState = this;
+            movement.SwitchState(movement.jumpState);
+
+        }
     }
 }

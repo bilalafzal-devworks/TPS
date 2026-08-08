@@ -15,12 +15,20 @@ public class RunningState : MovementBaseState
         if (Input.GetKeyUp(KeyCode.LeftShift)) ExitState(movement, movement.walkingState);
         else if (movement.dir.magnitude < 0.1f) ExitState(movement, movement.idleState);
         else if (Input.GetKeyDown(KeyCode.C)) ExitState(movement, movement.crouchState);
-        
+
         //speed Adjustment
         if (movement.vInput > 0)
             movement.currentSpeed = movement.runSpeed;
         else
             movement.currentSpeed = movement.runBackSpeed;
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            movement.previousState = this;
+           // movement.SwitchState(movement.jumpState);
+           ExitState(movement,movement.jumpState);
+
+        }
     }
     void ExitState(MovementStateManager movement, MovementBaseState state)
     {

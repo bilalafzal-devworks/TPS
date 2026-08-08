@@ -7,6 +7,7 @@ public class MovementStateManager : MonoBehaviour
 {
     [Header("Grounded-Msg")]
     [SerializeField] bool groundMsg;
+
     [Header("Input")]
     public float hzInput, vInput;
     #region Speed
@@ -33,10 +34,20 @@ public class MovementStateManager : MonoBehaviour
 
     #region MovementStates
     [HideInInspector] public MovementBaseState currentState;
+    [HideInInspector] public MovementBaseState previousState;
     [HideInInspector] public IdleState idleState = new IdleState();
     [HideInInspector] public WalkingState walkingState = new WalkingState();
     [HideInInspector] public RunningState runningState = new RunningState();
     [HideInInspector] public CrouchState crouchState = new CrouchState();
+    [HideInInspector] public JumpState jumpState = new JumpState();
+    #endregion
+
+    #region JumpState Parameters
+    [HideInInspector] public bool isJumped;
+    [SerializeField] float jumpForce = 10f;
+    [SerializeField] float airSpeed = 1.5f;
+    Vector3 airDir = Vector3.zero;
+
     #endregion
 
     void Awake()
@@ -62,6 +73,7 @@ public class MovementStateManager : MonoBehaviour
         // anim.SetFloat("hzInput", hzInput);
         // anim.SetFloat("vInput", vInput);
         ApplyGravity();
+        Falling();
         currentState.UpdateState(this);
     }
 
@@ -71,12 +83,16 @@ public class MovementStateManager : MonoBehaviour
         vInput = Input.GetAxis("Vertical");
         anim.SetFloat("hzInput", hzInput);
         anim.SetFloat("vInput", vInput);
-        dir = transform.forward * vInput + transform.right * hzInput;
+        Vector3 airDir = Vector3.zero;
+        if (!isGrounded())
+            airDir = transform.forward * vInput + transform.right * hzInput;
+        else
+            dir = transform.forward * vInput + transform.right * hzInput;
         // "Vector-Normalization" cause without out it, diagonal movement speed increase then actual speed 
-        characterController.Move(dir.normalized * currentSpeed * Time.deltaTime);
+        characterController.Move((dir.normalized * currentSpeed + airDir.normalized * airSpeed) * Time.deltaTime);
     }
 
-    bool isGrounded()
+    public bool isGrounded()
     {
         spherePos = new Vector3(transform.position.x, transform.position.y - groundYOffset, transform.position.z);
         if (Physics.CheckSphere(spherePos, characterController.radius - 0.05f, groundMask))
@@ -113,4 +129,8 @@ public class MovementStateManager : MonoBehaviour
         currentState = state;
         currentState.EnterState(this);
     }
+    public void JumpForce() => velocity.y += jumpForce;
+    public void Jumped() => isJumped = true;
+
+    void Falling() => anim.SetBool("Falling", !isGrounded());
 }
